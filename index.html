@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fairies and Unicorns v0.14</title>
+	
+<!-- Google tag (gtag.js) -->
+<!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-TFREZYFBWM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-TFREZYFBWM');
+</script> -->
+
+    <link rel="stylesheet" href="styles.css">
+    <script src="utils.js" defer></script>
+    <script src="producers.js" defer></script>
+    <script src="upgrades-templates.js" defer></script>
+    <script src="prestige-upgrades.js" defer></script>
+    <script src="upgrades.js" defer></script>
+    <script src="display.js" defer></script>
+    <script src="producer-templates.js" defer></script>
+    <script src="game-state.js" defer></script>
+    <script src="game-core.js" defer></script>
+</head>
+<body>
+<script src="chs.js"></script>
+<script src="core.js"></script>
+    <div class="game-container">
+        <div class="main-content-area">
+            <div class="tabs">
+                <button class="tab active" id="queen-tab" onclick="switchTab('queen')">
+                    <img src="images/QueenCrown.png" alt="" class="tab-icon">Queen
+                </button>
+                <button class="tab" id="upgrades-tab" onclick="switchTab('upgrades')">
+                    <img src="images/Upgrades.png" alt="" class="tab-icon">Upgrades
+                </button>
+                <button class="tab" id="clickers-tab" onclick="switchTab('clickers')">
+                    <img src="images/Fairy.png" alt="" class="tab-icon">Builders
+                </button>
+                <button class="tab locked" id="glitter-tab" onclick="switchTab('glitter')">
+                    <img src="images/Glitter.png" alt="" class="tab-icon">Glitter
+                </button>
+                <button class="tab locked" id="stardust-tab" onclick="switchTab('stardust')">
+                    <img src="images/Stardust.png" alt="" class="tab-icon">Stardust
+                </button>
+                <button class="tab locked" id="rainbow-tab" onclick="switchTab('rainbow')">
+                    <img src="images/Rainbow.png" alt="" class="tab-icon">Rainbows
+                </button>
+                <button class="tab locked" id="zombies-tab" onclick="switchTab('zombies')">
+                    <img src="images/ZombieChimera.png" alt="" class="tab-icon">Zombies
+                </button>
+                <button class="tab locked" id="leprechaun-tab" onclick="switchTab('leprechaun')">
+                    <img src="images/LeprechaunMain.png" alt="" class="tab-icon">Leprechaun
+                </button>
+                <button class="tab locked" id="royal-chamber-tab" onclick="switchTab('royal-chamber')">
+                    <img src="images/RoyalChamber.png" alt="" class="tab-icon">Royal Chamber
+                </button>
+                <button class="tab" id="stats-tab" onclick="switchTab('stats')">
+                    <img src="images/Stats.png" alt="" class="tab-icon">Stats
+                </button>
+            </div>
+
+            <div class="content-area">
+                <div class="header">
+                    <div class="resource-display">
+                        <div class="resource">
+                            <div class="click-hint" id="fairy-click-hint">Click me!</div>
+                            <div class="resource-count">Fairies: <span id="fairy-count">0</span></div>
+                            <div class="creature-icon fairy-icon" onclick="clickFairy()">
+                                <img src="images/Fairy.png" alt="Fairy" onerror="this.style.display='none'; this.parentElement.innerHTML='🧚';">
+                            </div>
+                            <div class="progress-bar"><div class="progress-fill" id="fairy-progress"></div></div>
+                            <div>Next: <span id="fairy-next">10</span></div>
+                            <div class="production-info">
+                                Fairies make <span id="fairy-production">0</span> Unicorn Molecules/sec<br>
+                                (<span id="fairy-prod-power">0</span> each<span id="fairy-rainbow-boost"></span>)
+                            </div>
+                        </div>
+                        <div class="resource">
+                            <div class="click-hint" id="unicorn-click-hint">Click me!</div>
+                            <div class="resource-count">Unicorns: <span id="unicorn-count">0</span></div>
+                            <div class="creature-icon unicorn-icon" onclick="clickUnicorn()">
+                                <img src="images/Unicorn.png" alt="Unicorn" onerror="this.style.display='none'; this.parentElement.innerHTML='🦄';">
+                            </div>
+                            <div class="progress-bar"><div class="progress-fill" id="unicorn-progress"></div></div>
+                            <div>Next: <span id="unicorn-next">100</span></div>
+                            <div class="production-info">
+                                Unicorns make <span id="unicorn-production">0</span> Fairy Molecules/sec<br>
+                                (<span id="unicorn-prod-power">0</span> each<span id="unicorn-rainbow-boost"></span>)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content">
+                    <div class="tab-panel active" id="queen-panel">
+                        <div class="queen-panel">
+                            <div class="content-wrapper">
+                                <div class="left-column">
+                                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                                        <img src="images/QueenCrown.png" alt="Queen Crown" style="width: 48px; height: 48px;" onerror="this.style.display='none';">
+                                        <h2 style="margin: 0;">The Fairy Queen<br>Comes to Earth</h2>
+                                    </div>
+                                    <div class="stat">Distance traveled: <span id="queen-distance-traveled">0</span> leagues</div>
+                                    <div class="stat">Distance left: <span id="queen-distance">100,000,000</span> leagues</div>
+                                    <div class="stat">Speed: <span id="queen-speed">1</span> leagues/hour</div>
+                                    <div class="stat">Time left: <span id="queen-time">2,740 years</span></div>
+                                    <div class="boost-info">
+                                        <span id="queen-productivity-boost">The Fairy Queen is increasing Fairies, Unicorns and Zombies productivity by 1x</span>
+                                        <div class="queen-speed-prompt">Make the Fairy Queen travel faster!<br>Find several methods to speed her up,<br>and make her arrive as soon as possible.<br>You'll win the game when the Fairy Queen reaches Earth!</div>
+                                    </div>
+                                </div>
+                                <div class="right-column">
+                                    <div class="section-header">
+                                        <h3>Queen Accelerators</h3>
+                                        <div class="bulk-controls">
+                                            <div class="bulk-btn active" onclick="setQueenBulkMode(1)">x1</div>
+                                            <div class="bulk-btn" onclick="setQueenBulkMode(10)">x10</div>
+                                            <div class="bulk-btn" onclick="setQueenBulkMode(-1)">Max</div>
+                                        </div>
+                                    </div>
+                                    <div class="producers-grid" id="queen-accelerators"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-panel" id="royal-chamber-panel">
+                        <div class="panel">
+                            <div class="royal-chamber-header">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <img src="images/RoyalChamber.png" alt="Royal Essence" style="width: 48px; height: 48px;" onerror="this.style.display='none';">
+                                        <h2 style="margin: 0;">Royal Chamber</h2>
+                                    </div>
+                                    <!-- Ascension button will be dynamically added here -->
+                                </div>
+                                <div class="royal-essence-display">
+                                    <div class="royal-essence-count">
+                                        Royal Essence: <span id="royal-essence-count">0</span>
+                                    </div>
+                                    <div class="royal-essence-description">
+                                        Condensed magical power from your proximity to the Fairy Queen. 
+                                        <br>Use it to purchase permanent upgrades that carry over between runs.
+										<br><strong>Gained from:</strong> distance traveled, current gold, and time spent since last ascension. 
+<br>Formula: √(distance traveled) + √(gold) + √(time in minutes) = Royal Essence per ascension.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="prestige-content">
+                                <div id="prestige-upgrades-container">
+                                    <!-- Prestige upgrades will be dynamically generated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-panel" id="stats-panel">
+                        <div class="stats-panel">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <img src="images/Stats.png" alt="Stats" style="width: 48px; height: 48px;" onerror="this.style.display='none';">
+                                <h2 style="margin: 0;">Game Statistics</h2>
+                            </div>
+                            <div class="stats-grid">
+                                <div class="stats-section">
+                                    <h3>⏰ Time & Progress</h3>
+                                    <div class="stat-item">Time in current Ascension: <span id="stat-time-played">0m 0s</span></div>
+                                    <div class="stat-item">Total Time Played: <span id="stat-total-time-played">0m 0s</span></div>
+                                    <div class="stat-item">Total Distance Traveled: <span id="stat-distance-traveled">0</span> leagues</div>
+                                    <div class="stat-item">Max Queen Speed: <span id="stat-max-speed">1</span> leagues/hour</div>
+                                    <div class="stat-item">Games Saved: <span id="stat-saves-count">0</span></div>
+                                </div>
+                                <div class="stats-section">
+                                    <h3>👆 Manual Actions</h3>
+                                    <div class="stat-item">Fairy Clicks: <span id="stat-fairy-clicks">0</span></div>
+                                    <div class="stat-item">Unicorn Clicks: <span id="stat-unicorn-clicks">0</span></div>
+                                    <div class="stat-item">Fairy Rerolls: <span id="stat-fairy-rerolls">0</span></div>
+                                    <div class="stat-item">Unicorn Rerolls: <span id="stat-unicorn-rerolls">0</span></div>
+                                    <div class="stat-item">Rainbow Rerolls: <span id="stat-rainbow-rerolls">0</span></div>
+                                </div>
+                                <div class="stats-section">
+                                    <h3>🧚‍♀️🦄 Creatures Generated</h3>
+                                    <div class="stat-item">Total Fairies: <span id="stat-total-fairies">0</span></div>
+                                    <div class="stat-item">Total Unicorns: <span id="stat-total-unicorns">0</span></div>
+                                    <div class="stat-item">Total Zombies: <span id="stat-total-zombies">0</span></div>
+                                    <div class="stat-item">Total Builders: <span id="stat-total-autoclickers">0</span></div>
+                                </div>
+                                <div class="stats-section">
+                                    <h3>✨ Resources Generated</h3>
+                                    <div class="stat-item">Total Glitter: <span id="stat-total-glitter">0</span></div>
+                                    <div class="stat-item">Total Stardust: <span id="stat-total-stardust">0</span></div>
+                                    <div class="stat-item">Total Rainbows: <span id="stat-total-rainbows">0</span></div>
+                                    <div class="stat-item">Total Gold: <span id="stat-total-gold">0</span></div>
+                                    <div class="stat-item">Total Queen Accelerators: <span id="stat-total-accelerators">0</span></div>
+                                </div>
+                                <div class="stats-section">
+                                    <h3>🏭 Producers Built</h3>
+                                    <div class="stat-item">Glitter Producers: <span id="stat-glitter-producers">0</span></div>
+                                    <div class="stat-item">Stardust Producers: <span id="stat-stardust-producers">0</span></div>
+                                    <div class="stat-item">Cloud Producers: <span id="stat-cloud-producers">0</span></div>
+                                    <div class="stat-item">Leprechaun Producers: <span id="stat-leprechaun-producers">0</span></div>
+                                </div>
+                                <div class="stats-section">
+                                    <h3>🎯 Upgrades Purchased</h3>
+                                    <div class="stat-item">Production Boosts: <span id="stat-production-upgrades">0</span></div>
+                                    <div class="stat-item">Cost Reductions: <span id="stat-cost-upgrades">0</span></div>
+                                    <div class="stat-item">Special Upgrades: <span id="stat-special-upgrades">0</span></div>
+                                    <div class="stat-item">Total Upgrades: <span id="stat-total-upgrades">0</span></div>
+                                </div>
+                                <div class="stats-section">
+                                    <h3>👑 Ascension Progress</h3>
+                                    <div class="stat-item">Total Ascensions: <span id="stat-total-ascensions">0</span></div>
+                                    <div class="stat-item">Royal Essence: <span id="stat-royal-essence">0</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-panel" id="clickers-panel">
+                        <div class="panel">
+                            <div class="section-header">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <img src="images/Fairy.png" alt="Fairy" style="width: 48px; height: 48px;" onerror="this.style.display='none';">
+                                    <h2 style="margin: 0;">Builders</h2>
+                                </div>
+                                <div class="bulk-controls">
+                                    <div class="bulk-btn active" onclick="setAutoclickerBulkMode(1)">x1</div>
+                                    <div class="bulk-btn" onclick="setAutoclickerBulkMode(10)">x10</div>
+                                    <div class="bulk-btn" onclick="setAutoclickerBulkMode(-1)">Max</div>
+                                </div>
+                            </div>
+                            <p class="info">Builders automatically click Fairies and Unicorns for you!</p>
+                            <div class="producers-grid" id="autoclicker-producers"></div>
+                        </div>
+                    </div>
+
+                    <div class="tab-panel" id="upgrades-panel">
+                        <div class="panel">
+                            <div id="upgrades-container"></div>
+                        </div>
+                    </div>
+
+                    <div class="tab-panel" id="glitter-panel">
+                        <div class="panel">
+                            <div class="section-header">
+                                <div class="resource-info">
+                                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                                        <img src="images/Glitter.png" alt="Glitter" style="width: 32px; height: 32px;" onerror="this.style.display='none';">
+                                        <div class="resource-title">Glitter: <span id="glitter-count">0</span> (<span id="glitter-per-sec">0</span>/sec)</div>
+                                    </div>
+                                </div>
+                                <div class="bulk-controls">
+                                    <div class="bulk-btn active" onclick="setBulkMode(1)">x1</div>
+                                    <div class="bulk-btn" onclick="setBulkMode(10)">x10</div>
+                                    <div class="bulk-btn" onclick="setBulkMode(-1)">Max</div>
+                                </div>
+                            </div>
+                            <div class="producers-grid" id="glitter-producers"></div>
+                        </div>
+                    </div>
+
+                    <div class="tab-panel" id="stardust-panel">
+                        <div class="panel">
+                            <div class="section-header">
+                                <div class="resource-info">
+                                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                                        <img src="images/Stardust.png" alt="Stardust" style="width: 32px; height: 32px;" onerror="this.style.display='none';">
+                                        <div class="resource-title">Stardust: <span id="stardust-count">0</span> (<span id="stardust-per-sec">0</span>/sec)</div>
+                                    </div>
+                                </div>
+                                <div class="bulk-controls">
+                                    <div class="bulk-btn active" onclick="setStardustBulkMode(1)">x1</div>
+                                    <div class="bulk-btn" onclick="setStardustBulkMode(10)">x10</div>
+                                    <div class="bulk-btn" onclick="setStardustBulkMode(-1)">Max</div>
+                                </div>
+                            </div>
+                            <div class="producers-grid" id="stardust-producers"></div>
+                        </div>
+                    </div>
+
+                    <div class="tab-panel" id="rainbow-panel">
+                        <div class="panel">
+                            <div class="content-wrapper">
+                                <div class="left-column">
+                                    <div class="resource-info">
+                                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                                            <img src="images/Rainbow.png" alt="Rainbow" style="width: 32px; height: 32px;" onerror="this.style.display='none';">
+                                            <div class="resource-title">Rainbows: <span id="rainbow-count">0</span></div>
+                                        </div>
+                                        <div class="resource-desc">
+                                            <span id="rainbow-production-text">Rainbows boost each Fairy by +0 Unicorn Molecules/sec</span>
+                                        </div>
+                                        <div id="gold-display" class="gold-info">
+                                            <div class="resource-title">Gold: <span id="gold-count">0</span> (<span id="gold-per-sec">0</span> / sec)</div>
+                                            <div class="resource-desc">Each Rainbow produces gold for the Leprechaun!</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="progress-section">
+                                        <div>Rainbow Progress:</div>
+                                        <div class="progress-bar large">
+                                            <div class="progress-fill" id="rainbow-progress-fill"></div>
+                                        </div>
+                                        <div><span id="rainbow-progress-text">0/1000</span></div>
+                                    </div>
+
+                                    <div style="margin: 20px 0; text-align: center;">
+                                        <div id="rainbow-boost-status" style="font-size: 1.1em; margin-bottom: 10px; font-weight: bold;">
+                                            Rainbows are boosting Fairies
+                                        </div>
+                                        <button class="btn-primary large" onclick="toggleRainbowTarget()">
+                                            <span id="rainbow-toggle-text">Click to boost Unicorns</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="right-column">
+                                    <div class="section-header">
+                                        <div></div>
+                                        <div class="bulk-controls">
+                                            <div class="bulk-btn active" onclick="setCloudBulkMode(1)">x1</div>
+                                            <div class="bulk-btn" onclick="setCloudBulkMode(10)">x10</div>
+                                            <div class="bulk-btn" onclick="setCloudBulkMode(-1)">Max</div>
+                                        </div>
+                                    </div>
+                                    <div class="producers-grid" id="cloud-producers"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-panel" id="zombies-panel">
+                        <div class="panel">
+                            <div class="section-header">
+                                <div class="resource-info">
+                                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                                        <img src="images/ZombieChimera.png" alt="Zombie Chimera" style="width: 32px; height: 32px;" onerror="this.style.display='none';">
+                                        <div class="resource-title">Zombies</div>
+                                    </div>
+                                    <div class="resource-desc">Zombies can only be obtained through their autobuyers - no manual purchasing!</div>
+                                </div>
+                            </div>
+                            <div class="producers-grid" id="zombie-producers"></div>
+                        </div>
+                    </div>
+
+                    <div class="tab-panel" id="leprechaun-panel">
+                        <div class="panel">
+                            <div class="section-header">
+                                <div class="resource-info">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <img src="images/LeprechaunMain.png" alt="Leprechaun" style="width: 48px; height: 48px;" onerror="this.style.display='none';">
+                                        <div class="resource-title" style="margin: 0;">Leprechaun's Workshop</div>
+                                    </div>
+                                    <div class="resource-desc">
+                                        Gold: <span id="leprechaun-gold-count">0</span> (<span id="leprechaun-gold-per-sec">0</span> / sec)
+                                    </div>
+                                    <div class="small-desc">The Leprechaun uses his gold to craft powerful magical enhancements!</div>
+                                </div>
+                                <div class="bulk-controls">
+                                    <div class="bulk-btn active" onclick="setLeprechaunBulkMode(1)">x1</div>
+                                    <div class="bulk-btn" onclick="setLeprechaunBulkMode(10)">x10</div>
+                                    <div class="bulk-btn" onclick="setLeprechaunBulkMode(-1)">Max</div>
+                                </div>
+                            </div>
+                            <div class="producers-grid" id="leprechaun-producers"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="save-controls">
+                <button class="btn-about" onclick="showAboutModal()">About</button>
+                <button class="btn-save save-button" onclick="saveGame()">💾 Save</button>
+                <button class="btn-load load-button" onclick="loadGame()">📁 Load</button>
+                <button class="btn-export" onclick="exportSave()">📤 Export</button>
+                <button class="btn-import import-button" onclick="showImportDialog()">📥 Import</button>
+                <button class="btn-pause" id="pause-button" onclick="togglePause()">⏸️ Pause</button>
+                <button class="btn-hard-reset" onclick="showHardResetConfirmation()">🗑️ Hard Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div id="about-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Fairies and Unicorns</h3>
+            <p>
+                <strong>An incremental game by Eduardo Abel Gimenez <a href="https://www.magicaweb.com" title="La Mágica Web" target="_blank">(magicaweb.com)</a>, with contributions from Gabriel Gimenez Franz.</strong>
+            </p>
+            <p style="font-size: 0.8em;">
+                Images designed by <a href="https://www.flaticon.com/authors/zlatko-najdenovski" title="Zlatko Najdenovski" target="_blank">Zlatko Najdenovski</a> from <a href="https://www.flaticon.com/" title="Flaticon" target="_blank">www.flaticon.com</a> and Eduardo Abel Gimenez, except: Comet icon designed by <a href="https://www.flaticon.com/authors/good-ware" title="Good Ware" target="_blank">Good Ware</a> from <a href="https://www.flaticon.com/" title="Flaticon" target="_blank">www.flaticon.com</a>, and Shooting Star icon designed by <a href="https://www.flaticon.com/authors/freepik" title="Freepik" target="_blank">Freepik</a>.
+            </p>
+            <div class="modal-buttons">
+                <button class="btn-primary" onclick="closeAboutModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading-screen" class="modal-overlay loading">
+        <div class="loading-content">
+            <div>‍♀️ Loading Fairies and Unicorns...</div>
+            <div>Please wait while magic loads</div>
+        </div>
+    </div>
+
+    <div id="export-dialog" class="modal-overlay">
+        <div class="modal-content">
+            <h3>📤 Export Save Data</h3>
+            <p>Copy this save data to share or backup your progress:</p>
+            <textarea id="export-textarea" readonly placeholder="Your save data will appear here..."></textarea>
+            <div class="modal-buttons">
+                <button class="btn-primary copy-button" onclick="copyExportData()">📋 Copy to Clipboard</button>
+                <button class="btn-secondary" onclick="closeExportDialog()">✖️ Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="import-dialog" class="modal-overlay">
+        <div class="modal-content">
+            <h3>📥 Import Save Data</h3>
+            <p>Paste your save data below to load your game:</p>
+            <textarea id="import-textarea" placeholder="Paste your save data here..."></textarea>
+            <div class="modal-buttons">
+                <button class="btn-primary" onclick="loadImportData()">📁 Load Save</button>
+                <button class="btn-secondary" onclick="closeImportDialog()">✖️ Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="offline-progress-modal" class="modal-overlay">
+        <div class="modal-content offline-progress">
+            <h3>⏰ Welcome Back!</h3>
+            <p>You were offline for: <span id="offline-duration">0m</span></p>
+            
+            <div class="offline-gains" id="offline-gains">
+                <!-- Gains will be populated by JavaScript -->
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="btn-primary" onclick="closeOfflineModal()">✨ Continue Adventure</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ascension Confirmation Modal -->
+    <div id="ascension-confirm-modal" class="modal-overlay">
+        <div class="modal-content ascension-confirm">
+            <h3>👑 Royal Ascension</h3>
+            <p>You are about to ascend and gain <strong><span id="essence-preview">0</span></strong> Royal Essence.</p>
+            
+            <div class="ascension-details">
+                <div class="ascension-section">
+                    <h4>❌ You will lose:</h4>
+                    <ul id="ascension-lost">
+                        <!-- Will be populated dynamically -->
+                    </ul>
+                </div>
+                
+                <div class="ascension-section">
+                    <h4>✅ You will keep:</h4>
+                    <ul id="ascension-kept">
+                        <!-- Will be populated dynamically -->
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="btn-secondary" onclick="closeAscensionConfirm()">❌ Cancel</button>
+                <button class="btn-primary" onclick="confirmAscension()">👑 Ascend!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ascension Results Modal -->
+    <div id="ascension-results-modal" class="modal-overlay">
+        <div class="modal-content ascension-results">
+            <h3>🎉 Ascension Complete!</h3>
+            <div class="ascension-results-content">
+                <div class="essence-gained">
+                    <h4>You gained <span id="essence-gained">0</span> Royal Essence!</h4>
+                </div>
+                <div class="ascension-stats">
+                    <div class="stat-line">Total Royal Essence: <span id="total-essence">0</span></div>
+                    <div class="stat-line">Total Ascensions: <span id="ascension-count">0</span></div>
+                </div>
+                <div class="ascension-message">
+                    Visit the Royal Chamber to spend your Royal Essence on permanent upgrades!
+                </div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="btn-primary" onclick="closeAscensionResults()">✨ Begin New Journey</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hard Reset Confirmation Modal -->
+    <div id="hard-reset-modal" class="modal-overlay">
+        <div class="modal-content hard-reset-confirm">
+            <h3>🗑️ Hard Reset Confirmation</h3>
+            <p><strong>Warning:</strong> This will permanently delete ALL your progress and return the game to its initial state!</p>
+            
+            <div class="hard-reset-details">
+                <h4>❌ You will lose EVERYTHING:</h4>
+                <ul>
+                    <li>All creatures, resources, and producers</li>
+                    <li>All purchased upgrades and slots</li>
+                    <li>All Royal Essence and prestige upgrades</li>
+                    <li>All statistics and achievements</li>
+                    <li>Queen progress and speed</li>
+                    <li>Your saved game data</li>
+                </ul>
+                <p><strong>This action cannot be undone!</strong></p>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="btn-secondary emphasized" onclick="closeHardResetModal()">❌ No, Keep My Progress</button>
+                <button class="btn-danger" onclick="performHardReset()">🗑️ Yes, Reset Everything</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Congratulations Modal -->
+    <div id="congratulations-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Congratulations!</h3>
+            <p>Thanks to your skill, the Fairy Queen reached Earth much faster than we thought. Today is a day of celebration for the Fairies and Unicorns!</p>
+            <div class="modal-buttons">
+                <button class="btn-primary" onclick="continuePlaying()">Continue playing</button>
+                <button class="btn-secondary" onclick="performHardResetAndCloseModal()">Start over</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
